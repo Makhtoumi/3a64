@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit {{ indicator.name }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="my-4">Edit {{ indicator.name }}</h1>
+
+    {{ form_start(form) }}
+        <div class="card">
+            <div class="card-body">
+                {{ form_row(form.name) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.calculationFormula) }}
+                {{ form_row(form.isActive) }}
+                
+                <div class="mb-4">
+                    <h5>Thresholds</h5>
+                    <div class="thresholds-container"
+                         data-prototype="{{ form_widget(form.thresholds.vars.prototype)|e('html_attr') }}"
+                         data-index="{{ form.thresholds|length }}">
+                        {% for threshold in form.thresholds %}
+                            <div class="threshold-item mb-3 p-3 border rounded">
+                                {{ form_row(threshold.level) }}
+                                {{ form_row(threshold.operator) }}
+                                {{ form_row(threshold.value) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary add-threshold">
+                        <i class="bi bi-plus"></i> Add Threshold
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Update
+                </button>
+                <a href="{{ path('app_analyse_indicator') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+</div>
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Same threshold addition script as in new.html.twig
+</script>
+{% endblock %}
+{% endblock %}

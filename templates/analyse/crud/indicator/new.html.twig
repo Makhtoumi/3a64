@@ -1,0 +1,74 @@
+{# templates/analyse/crud/indicator/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}New Analysis Indicator{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="my-4">Create New Analysis Indicator</h1>
+    {{ form_start(form) }}
+        <div class="card">
+            <div class="card-body">
+                {# Render each field ONLY ONCE #}
+                {{ form_row(form.name) }}
+                {{ form_row(form.description) }}
+                
+                {# Custom rendering for calculation formula #}
+                <div class="mb-3">
+                    {{ form_label(form.calculationFormula) }}
+                    {{ form_widget(form.calculationFormula, {
+                        'attr': {'data-metrics': available_metrics|join(',')}
+                    }) }}
+                    {{ form_help(form.calculationFormula) }}
+                    {{ form_errors(form.calculationFormula) }}
+                </div>
+    
+                {{ form_row(form.isActive) }}
+    
+                {# Thresholds section #}
+                <div class="mb-4">
+                    <h5>Thresholds</h5>
+                    <div class="thresholds-container"
+                         data-prototype="{{ form_widget(form.thresholds.vars.prototype)|e('html_attr') }}"
+                         data-index="{{ form.thresholds|length }}">
+                        {% for threshold in form.thresholds %}
+                            <div class="threshold-item mb-3 p-3 border rounded">
+                                {{ form_row(threshold.level) }}
+                                {{ form_row(threshold.operator) }}
+                                {{ form_row(threshold.value) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary add-threshold">
+                        <i class="bi bi-plus"></i> Add Threshold
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+                <a href="{{ path('app_analyse_indicator') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+    
+</div>
+
+{% block javascripts %}
+<script>
+document.querySelector('.add-threshold').addEventListener('click', function() {
+    const container = document.querySelector('.thresholds-container');
+    const prototype = container.dataset.prototype;
+    const index = container.dataset.index;
+    
+    const newForm = prototype.replace(/__name__/g, index);
+    container.insertAdjacentHTML('beforeend', newForm);
+    container.dataset.index = parseInt(index) + 1;
+});
+</script>
+{% endblock %}
+{% endblock %}

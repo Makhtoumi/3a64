@@ -13,15 +13,43 @@
         {% endfor %}
     {% endfor %}
 </div>
-    <div class="d-flex justify-content-between mb-4">
-
-        <h1>Analyse des Données</h1>
-        <div class="btn-group">
-            <a href="{{ path('app_analyse_cleanup') }}" class="btn btn-warning">Nettoyer les données</a>
-            <a href="{{ path('app_analyse_notify') }}" class="btn btn-info">Envoyer les rappels</a>
-        </div>
+<div class="d-flex justify-content-between mb-4">
+    <h1>Analyse des Données</h1>
+    <div class="btn-group">
+        {# Add this new button #}
+        <a href="{{ path('app_analyse_indicator') }}" class="btn btn-success">
+            <i class="bi bi-speedometer2"></i> Gérer les Indicateurs
+        </a>
+        <a href="{{ path('app_analyse_cleanup') }}" class="btn btn-warning">
+            <i class="bi bi-trash"></i> Nettoyer les données
+        </a>
+        <a href="{{ path('app_analyse_notify') }}" class="btn btn-info">
+            <i class="bi bi-bell"></i> Envoyer les rappels
+        </a>
     </div>
-
+</div>
+    <div class="row mb-4">
+        {% for indicator in stats.indicators %}
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ indicator.name }}</h5>
+                    <div class="display-4 text-{{ indicator.status }}">
+                        {{ indicator.value|default('N/A')|number_format(2) }}
+                    </div>
+                    <small class="text-muted">{{ indicator.description }}</small>
+                    {% if indicator.error is defined %}
+                    <div class="text-danger small mt-2">{{ indicator.error }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">No active indicators found</div>
+        </div>
+        {% endfor %}
+    </div>
     <div class="card mb-4">
         <div class="card-header">Filtres</div>
         <div class="card-body">
@@ -56,6 +84,17 @@
                 <div class="card-header">Statistiques des Commandes</div>
                 <div class="card-body">
                     <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Évolution des Commandes par Jour</div>
+                <div class="card-body">
+                    <canvas id="dailyCommandsChart"></canvas>
                 </div>
             </div>
         </div>
@@ -148,6 +187,35 @@
                         '#9966FF'
                     ]
                 }]
+            }
+        });
+
+        new Chart(document.getElementById('dailyCommandsChart'), {
+            type: 'line',
+            data: {
+                labels: {{ stats.orders.daily|map(d => d.date|date('d/m/Y'))|json_encode|raw }},
+                datasets: [{
+                    label: 'Nombre de Commandes',
+                    data: {{ stats.orders.daily|map(d => d.count)|json_encode|raw }},
+                    borderColor: '#4BC0C0',
+                    tension: 0.1,
+                    fill: false
+                },
+                {
+                    label: 'Chiffre d\'Affaires (€)',
+                    data: {{ stats.orders.daily|map(d => d.total)|json_encode|raw }},
+                    borderColor: '#9966FF',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
     </script>

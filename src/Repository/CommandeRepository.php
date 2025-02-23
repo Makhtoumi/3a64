@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\Commande;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
+use App\Repository\CommandeRepository;
 /**
  * @extends ServiceEntityRepository<Commande>
  *
@@ -124,7 +124,6 @@ public function getAverageOrderValue(): float
 
 
 
-
 public function getTotalSalesByFilters(array $filters): float
 {
     $qb = $this->createQueryBuilder('c')
@@ -146,6 +145,20 @@ private function applyDateFilters($qb, array $filters, string $fieldName): void
         $qb->andWhere("c.$fieldName <= :end")
            ->setParameter('end', $filters['end_date']);
     }
+}
+
+public function getDailyStats(): array
+{
+    return $this->createQueryBuilder('c')
+        ->select(
+            "DATE(c.date) as date", // Use DATE() instead of DATE_FORMAT
+            'COUNT(c.id) as count',
+            'SUM(c.totale) as total'
+        )
+        ->groupBy('date')
+        ->orderBy('date')
+        ->getQuery()
+        ->getResult();
 }
 //    /**
 //     * @return Commande[] Returns an array of Commande objects

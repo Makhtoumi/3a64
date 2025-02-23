@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PrescriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: PrescriptionRepository::class)]
 class Prescription

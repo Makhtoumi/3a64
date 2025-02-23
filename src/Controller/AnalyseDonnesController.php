@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use App\Repository\AppointmentRepository;
+use App\Entity\AnalysisIndicator ; 
+use App\Form\AnalysisIndicatorType ;
 
 class AnalyseDonnesController extends AbstractController
 {
@@ -184,4 +186,66 @@ public function sendNotifications(): Response
 
     return $this->redirectToRoute('app_analyse_index');
 }
+
+#[Route('/admin/analyses/indicators', name: 'app_analyse_indicator')]
+public function indicatorCrud(): Response
+{
+    $indicators = $this->em->getRepository(AnalysisIndicator::class)->findAll();
+    
+    return $this->render('analyse/crud/indicator/index.html.twig', [
+        'indicators' => $indicators,
+        'currentValues' => $this->statsGenerator->getIndicatorValues($indicators)
+    ]);
+}
+
+#[Route('/admin/analyses/indicators/new', name: 'app_analyse_indicator_new')]
+public function newIndicator(Request $request): Response
+{
+    $indicator = new AnalysisIndicator();
+    $form = $this->createForm(AnalysisIndicatorType::class, $indicator);
+    
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $this->em->persist($indicator);
+        $this->em->flush();
+        
+        $this->addFlash('success', 'Indicator created successfully');
+        return $this->redirectToRoute('app_analyse_indicator');
+    }
+    
+    return $this->render('analyse/crud/indicator/new.html.twig', [
+        'form' => $form->createView() , 
+        'available_metrics' => $this->statsGenerator->getAvailableMetrics()
+    ]);
+}
+
+#[Route('/admin/analyses/indicators/{id}/edit', name: 'app_analyse_indicator_edit')]
+public function editIndicator(Request $request, AnalysisIndicator $indicator): Response
+{
+    $form = $this->createForm(AnalysisIndicatorType::class, $indicator);
+    $form->handleRequest($request);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+        $this->em->flush();
+        
+        $this->addFlash('success', 'Indicator updated successfully');
+        return $this->redirectToRoute('app_analyse_indicator');
+    }
+    
+    return $this->render('analyse/crud/indicator/edit.html.twig', [
+        'form' => $form->createView(),
+        'indicator' => $indicator
+    ]);
+}
+
+#[Route('/admin/analyses/indicators/{id}/delete', name: 'app_analyse_indicator_delete')]
+public function deleteIndicator(AnalysisIndicator $indicator): Response
+{
+    $this->em->remove($indicator);
+    $this->em->flush();
+    
+    $this->addFlash('success', 'Indicator deleted successfully');
+    return $this->redirectToRoute('app_analyse_indicator');
+}
+
 }
