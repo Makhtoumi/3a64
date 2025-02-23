@@ -1,0 +1,4 @@
+"ID","Date","Client/Montant","Statut","Détails"
+{% for row in data %}
+"{{ row.id }}","{{ row.date|date('Y-m-d H:i') }}","{% if row.type == 'appointment' %}{{ row.clientName }}{% else %}{{ row.totale|format_currency('EUR') }}{% endif %}","{{ row.statut }}","{% if row.type == 'appointment' %}Médecin: {{ row.doctor }}{% else %}Produit: {{ row.produit }}{% endif %}"
+{% endfor %}

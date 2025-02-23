@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord Analytique{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+    <div class="d-flex justify-content-between mb-4">
+
+        <h1>Analyse des Données</h1>
+        <div class="btn-group">
+            <a href="{{ path('app_analyse_cleanup') }}" class="btn btn-warning">Nettoyer les données</a>
+            <a href="{{ path('app_analyse_notify') }}" class="btn btn-info">Envoyer les rappels</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Filtres</div>
+        <div class="card-body">
+            {{ form_start(filterForm) }}
+            <div class="row g-3">
+                <div class="col-md-3">
+                    {{ form_row(filterForm.start_date) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(filterForm.end_date) }}
+                </div>
+
+                <div class="col-md-3 align-self-end">
+                    <button type="submit" class="btn btn-primary">Filtrer</button>
+                </div>
+            </div>
+            {{ form_end(filterForm) }}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">Statistiques des Rendez-vous</div>
+                <div class="card-body">
+                    <canvas id="appointmentsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">Statistiques des Commandes</div>
+                <div class="card-body">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Détails des Rendez-vous</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Date</th>
+                            <th>Médecin</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.clientName }}</td>
+                            <td>{{ appointment.appointmentDate|date('d/m/Y H:i') }}</td>
+                            <td>{{ appointment.doctor ? appointment.doctor.name : 'Non assigné' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Détails des Commandes</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th>Produit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commande in commandes %}
+                        <tr>
+                            <td>CMD-{{ commande.id }}</td>
+                            <td>{{ commande.date|date('d/m/Y H:i') }}</td>
+                            <td>{{ commande.totale|format_currency('EUR') }}</td>
+                            <td>{{ commande.statut|capitalize }}</td>
+                            <td>{{ commande.produits.nom }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+    <script>
+        // Chart configuration for appointments
+        new Chart(document.getElementById('appointmentsChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ stats.appointments.by_doctor|map(a => a.name)|json_encode|raw }},
+                datasets: [{
+                    label: 'Rendez-vous par Médecin',
+                    data: {{ stats.appointments.by_doctor|map(a => a.total)|json_encode|raw }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }]
+            }
+        });
+
+        // Chart configuration for orders
+        new Chart(document.getElementById('ordersChart'), {
+            type: 'pie',
+            data: {
+                labels: {{ stats.orders.status_distribution|map(s => s.statut)|json_encode|raw }},
+                datasets: [{
+                    data: {{ stats.orders.status_distribution|map(s => s.count)|json_encode|raw }},
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ]
+                }]
+            }
+        });
+    </script>
+    {% endblock %}
+{% endblock %}

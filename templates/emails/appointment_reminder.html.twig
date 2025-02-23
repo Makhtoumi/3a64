@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; }
+        .header { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .content { margin: 20px 0; }
+        .footer { color: #7f8c8d; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Rappel de Rendez-vous Médical</h2>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour {{ appointment.clientName }},</p>
+            <p>Nous vous rappelons votre rendez-vous prévu le :</p>
+            
+            <p><strong>Date :</strong> {{ appointment.appointmentDate|date('d/m/Y à H:i') }}</p>
+            {% if appointment.doctor %}
+            <p><strong>Avec :</strong> Dr. {{ appointment.doctor.name }} ({{ appointment.doctor.specialty }})</p>
+            {% endif %}
+            
+            <p>Merci de nous contacter au moindre empêchement.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Cordialement,<br>L'équipe médicale</p>
+        </div>
+    </div>
+</body>
+</html>

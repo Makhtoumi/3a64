@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .section { margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .total-row { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Rapport Analytique</h1>
+        <p>Généré le : {{ "now"|date("d/m/Y H:i") }}</p>
+        {% if filters.start_date or filters.end_date %}
+        <p>Période : 
+            {{ filters.start_date|default()|date('d/m/Y') }} 
+            {% if filters.end_date %} - {{ filters.end_date|date('d/m/Y') }}{% endif %}
+        </p>
+        {% endif %}
+    </div>
+    
+    <!-- Modifiez la section des commandes comme ceci -->
+    <div class="section">
+        <h2>Statistiques des Commandes</h2>
+        <table>
+            <tr>
+                <th>Statut</th>
+                <th>Nombre de Commandes</th>
+            </tr>
+            {% for stat in stats.orders.status_distribution|default([]) %}
+            <tr>
+                <td>{{ stat.statut|capitalize }}</td>
+                <td>{{ stat.count }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2">Aucune donnée disponible</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td>Chiffre d'affaires total</td>
+                <td>{{ stats.orders.total_sales|default(0)|format_currency('EUR') }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Statistiques des Commandes</h2>
+        <table>
+            <tr>
+                <th>Statut</th>
+                <th>Nombre de Commandes</th>
+            </tr>
+            {% for stat in stats.orders.status_distribution %}
+            <tr>
+                <td>{{ stat.statut|capitalize }}</td>
+                <td>{{ stat.count }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td>Chiffre d'affaires total</td>
+                <td>{{ stats.orders.total_sales|format_currency('EUR') }}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
