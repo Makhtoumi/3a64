@@ -194,7 +194,8 @@ public function indicatorCrud(): Response
     
     return $this->render('analyse/crud/indicator/index.html.twig', [
         'indicators' => $indicators,
-        'currentValues' => $this->statsGenerator->getIndicatorValues($indicators)
+        'currentValues' => $this->statsGenerator->getIndicatorValues($indicators),
+        'stats' => $this->statsGenerator->getGlobalStats(),
     ]);
 }
 
