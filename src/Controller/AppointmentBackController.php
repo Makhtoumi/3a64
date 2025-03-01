@@ -12,6 +12,8 @@ use App\Form\PrescriptionTypeBack;
 use App\Repository\AppointmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 
 class AppointmentBackController extends AbstractController
 {

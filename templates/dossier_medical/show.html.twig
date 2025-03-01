@@ -1,0 +1,34 @@
+{% extends app.user and 'ROLE_DOCTOR' in app.user.roles ? 'base.html.twig' : 'base-front.html.twig' %}
+
+{% block title %}Medical Record Details{% endblock %}
+
+{% block body %}
+    <h1>Medical Record Details</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Patient</th>
+                <td>{{ dossier_medical.patient.email }}</td>
+            </tr>
+            <tr>
+                <th>Allergies</th>
+                <td>{{ dossier_medical.allergies }}</td>
+            </tr>
+            <tr>
+                <th>Medications</th>
+                <td>{{ dossier_medical.medications }}</td>
+            </tr>
+            <tr>
+                <th>Diagnoses</th>
+                <td>{{ dossier_medical.diagnoses }}</td>
+            </tr>
+            <!-- Add other fields as needed -->
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_dossier_medical_index') }}">Back to List</a>
+    {% if 'ROLE_DOCTOR' in app.user.roles %}
+        <a href="{{ path('app_dossier_medical_edit', {'id': dossier_medical.id}) }}">Edit</a>
+    {% endif %}
+{% endblock %}

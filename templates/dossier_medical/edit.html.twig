@@ -1,0 +1,14 @@
+{% extends app.user and 'ROLE_DOCTOR' in app.user.roles ? 'base.html.twig' : 'base-front.html.twig' %}
+
+{% block title %}Edit Medical Record{% endblock %}
+
+{% block body %}
+    <h1>Edit Medical Record</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-primary">Update</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_dossier_medical_index') }}">Back to List</a>
+{% endblock %}

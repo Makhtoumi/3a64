@@ -1,3 +1,30 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+app_register:
+    path: /register
+    controller: App\Controller\RegistrationController::register
+app_waiting_approval:
+    path: /waiting-approval
+    controller: App\Controller\SecurityController::waitingApproval
+
+app_dossier_medical_index:
+    path: /dossier-medical
+    controller: App\Controller\DossierMedicalController::index
+
+app_dossier_medical_new:
+    path: /dossier-medical/new
+    controller: App\Controller\DossierMedicalController::new
+
+app_dossier_medical_show:
+    path: /dossier-medical/{id}
+    controller: App\Controller\DossierMedicalController::show
+
+app_dossier_medical_edit:
+    path: /dossier-medical/{id}/edit
+    controller: App\Controller\DossierMedicalController::edit
+
+app_dossier_medical_delete:
+    path: /dossier-medical/{id}
+    controller: App\Controller\DossierMedicalController::delete
+    methods: POST

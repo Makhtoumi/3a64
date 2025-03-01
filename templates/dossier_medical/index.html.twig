@@ -1,0 +1,47 @@
+{% extends app.user and 'ROLE_DOCTOR' in app.user.roles ? 'base.html.twig' : 'base-front.html.twig' %}
+
+{% block title %}Medical Records{% endblock %}
+
+{% block body %}
+    <h1>Medical Records</h1>
+
+    {% if 'ROLE_DOCTOR' in app.user.roles %}
+        <a href="{{ path('app_dossier_medical_new') }}">Create New</a>
+    {% endif %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Allergies</th>
+                <th>Medications</th>
+                <th>Diagnoses</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dossier_medical in dossier_medicals %}
+                <tr>
+                    <td>{{ dossier_medical.patient.email }}</td>
+                    <td>{{ dossier_medical.allergies }}</td>
+                    <td>{{ dossier_medical.medications }}</td>
+                    <td>{{ dossier_medical.diagnoses }}</td>
+                    <td>
+                        <a href="{{ path('app_dossier_medical_show', {'id': dossier_medical.id}) }}">View</a>
+                        {% if 'ROLE_DOCTOR' in app.user.roles %}
+                            <a href="{{ path('app_dossier_medical_edit', {'id': dossier_medical.id}) }}">Edit</a>
+                            <form action="{{ path('app_dossier_medical_delete', {'id': dossier_medical.id}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ dossier_medical.id) }}">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">No records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
